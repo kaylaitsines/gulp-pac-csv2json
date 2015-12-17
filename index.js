@@ -66,6 +66,7 @@ module.exports = function (options) {
         loop1:
         for (var i = data.length - 1; i >= 0; i--) {
           var item = data[i];
+          var exit = false;
 
           // filter rows with options.delRow.test
           loop2:
@@ -75,31 +76,34 @@ module.exports = function (options) {
 
             if (patt.test(item[condition.key])) {
               data.splice(i, 1);
-              break loop1;
+              exit = true;
+              break loop2;
             };
           };
 
-          // delete columns in options.delColumn
-          for (var n = options.delColumn.length - 1; n >= 0; n--) {
-            delete data[i][options.delColumn[n]];
+          if (!exit) {
+            // delete columns in options.delColumn
+            for (var n = options.delColumn.length - 1; n >= 0; n--) {
+              delete data[i][options.delColumn[n]];
+            };
+
+            // add columns in options.addColumn
+            for (var n = options.addColumn.length - 1; n >= 0; n--) {
+              var column = options.addColumn[n];
+              var value = column.func(data[i][column.param[0]]);
+              data[i][column.name] = value;
+            };
+
+            // beautify keys
+            var tmpRow = {};
+            for (var j in data[i]) {
+              var k = j.toLowerCase().replace(/ /g, '_');
+
+              tmpRow[k] = data[i][j];
+            };
+
+            tmpData.push(tmpRow);
           };
-
-          // add columns in options.addColumn
-          for (var n = options.addColumn.length - 1; n >= 0; n--) {
-            var column = options.addColumn[n];
-            var value = column.func(data[i][column.param[0]]);
-            data[i][column.name] = value;
-          };
-
-          // beautify keys
-          var tmpRow = {};
-          for (var j in data[i]) {
-            var k = j.toLowerCase().replace(/ /g, '_');
-
-            tmpRow[k] = data[i][j];
-          };
-
-          tmpData.push(tmpRow);
         };
 
         if (options.debug === 2) {

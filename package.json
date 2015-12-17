@@ -1,6 +1,6 @@
 {
   "name": "gulp-pac-csv2json",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A gulp plugin to generate json file from a formatted csv file",
   "main": "index.js",
   "dependencies": {
